@@ -11,6 +11,29 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import boto3
+
+# SSM region
+REGION = 'ap-northeast-1'
+
+# SSMパラメータストアから値を取得する関数
+def get_ssm_parameters(param_key):
+    ssm = boto3.client('ssm', region_name=REGION)
+    response = ssm.get_parameters(
+        Names=[
+            param_key,
+        ],
+        WithDecryption=True
+    )
+    return response['Parameters'][0]['Value']
+    
+
+# SSM params
+SSM_NAME = get_ssm_parameters('/rds/dbname')
+SSM_USER =  get_ssm_parameters('/rds/username')
+SSM_PASSWORD = get_ssm_parameters('/rds/userpass')
+SSM_HOST = get_ssm_parameters('/rds/endpoint')
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,10 +97,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': get_ssm_parameters('/rds/dbname'),
+        'USER': get_ssm_parameters('/rds/username'),
+        'PASSWORD': get_ssm_parameters('/rds/userpass'),
+        'HOST': get_ssm_parameters('/rds/endpoint')
     }
 }
 
@@ -167,3 +200,5 @@ LOGGING = {
 }
 
 
+
+    

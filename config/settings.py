@@ -28,13 +28,6 @@ def get_ssm_parameters(param_key):
     return response['Parameters'][0]['Value']
     
 
-# SSM params
-SSM_NAME = get_ssm_parameters('/rds/dbname')
-SSM_USER =  get_ssm_parameters('/rds/username')
-SSM_PASSWORD = get_ssm_parameters('/rds/userpass')
-SSM_HOST = get_ssm_parameters('/rds/endpoint')
-
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
